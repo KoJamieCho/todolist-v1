@@ -5,18 +5,32 @@ const bodyParser = require("body-parser");
 
 const app = express();
 
+let items = ["Buy Food","Cook Food","Eat Food"];
+
+app.set("view engine", "ejs");
+
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.get("/", function(req, res) { // request, response
-    var today = new Date();
-    var currentDate = today.getDay();
-    
-    if(currentDate === 6 || currentDate === 0) {
-        res.write("<h1>Yay It's teh weekend!</h1>");
-    } else {
-        //res.write("<p>It is not the weekend.</p>"); // write on the page
-        //res.write("<h1>Boo! I have to work!</h1>");
-        res.sendFile(__dirname + "/index.html"); // call file(__dirname: directory name)
-    }
-    //res.send(); // send written text
+    let today = new Date();
+
+    let options = {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+    };
+
+    let day = today.toLocaleDateString("en-US", options);
+
+    res.render("list", { kindOfDay : day, newListItems: items});
+
+});
+
+app.post("/", function(req, res){
+    let item = req.body.newItem;
+    items.push(item);
+
+    res.redirect("/");
 });
 
 app.listen(3000,function() {
